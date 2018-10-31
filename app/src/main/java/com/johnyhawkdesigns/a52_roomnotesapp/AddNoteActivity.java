@@ -33,6 +33,7 @@ public class AddNoteActivity extends AppCompatActivity {
         Button button = findViewById(R.id.but_save);
 
         // If we receive note data in intent, that means we are updating an existing note
+        Log.i(TAG, "onCreate: ");
         if ((note = (Note) getIntent().getSerializableExtra("note")) != null)
         {
             getSupportActionBar().setTitle("Update Note");
@@ -45,14 +46,14 @@ public class AddNoteActivity extends AppCompatActivity {
         // else if there is no intent data received, means we are adding a new Note
         else
         {
-            note = new Note(et_title.getText().toString(), et_content.getText().toString());
+            note = new Note(et_content.getText().toString(), et_title.getText().toString() );
             new InsertTask(AddNoteActivity.this, note).execute();
         }
     }
 
     private void setResult(Note note, int flag){
         setResult(flag, new Intent().putExtra("note", note));
-        finish();
+        //finish();
     }
 
     private static class InsertTask extends AsyncTask<Void, Void, Boolean>{
@@ -72,7 +73,7 @@ public class AddNoteActivity extends AppCompatActivity {
             // retrieve auto incremented note id
             long j = activityReference.get().noteDatabase.getNoteDao().insertNote(note);
             note.setNote_id(j);
-            Log.d("ID ", "doInBackground: "+j );
+            Log.d("ID ", "doInBackground: j = " + j );
             return true;
         }
 

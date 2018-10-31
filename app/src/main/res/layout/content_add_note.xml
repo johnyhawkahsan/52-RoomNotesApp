@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="AddNoteActivity"
+    tools:context="com.johnyhawkdesigns.a52_roomnotesapp.AddNoteActivity"
     tools:showIn="@layout/activity_add_note">
 
 </android.support.constraint.ConstraintLayout>

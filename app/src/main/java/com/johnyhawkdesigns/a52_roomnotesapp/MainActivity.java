@@ -45,7 +45,9 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this, AddNoteActivity.class), 100);
+                Log.i(TAG, "onClick: Launch new AddNoteActivity");
+                Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
+                startActivityForResult(intent, 100);
             }
         });
 
@@ -94,15 +96,10 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
     }
 
 
-    private View.OnClickListener fabOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            startActivityForResult(new Intent(MainActivity.this, AddNoteActivity.class), 100);
-        }
-    };
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
         if (requestCode == 100 && resultCode > 0) {
             if (resultCode == 1) {
                 notes.add((Note) data.getSerializableExtra("note"));
@@ -123,11 +120,13 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
                         switch (i) {
                             case 0:
                                 noteDatabase.getNoteDao().deleteNote(notes.get(pos));
+                                Log.i(TAG, "onClick: delete item at position = " + pos);
                                 notes.remove(pos);
                                 listVisibility();
                                 break;
                             case 1:
                                 MainActivity.this.pos = pos;
+                                Log.i(TAG, "onClick: update item at position = " + pos);
                                 startActivityForResult(
                                         new Intent(MainActivity.this,
                                                 AddNoteActivity.class).putExtra("note", notes.get(pos)),
