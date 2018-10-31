@@ -6,6 +6,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import com.johnyhawkdesigns.a52_roomnotesapp.notedb.NoteDatabase;
@@ -34,26 +35,63 @@ public class AddNoteActivity extends AppCompatActivity {
 
         // If we receive note data in intent, that means we are updating an existing note
         Log.i(TAG, "onCreate: ");
-        if ((note = (Note) getIntent().getSerializableExtra("note")) != null)
-        {
+/*
+        if ( (note = (Note) getIntent().getSerializableExtra("note"))!=null ){
             getSupportActionBar().setTitle("Update Note");
             update = true;
             button.setText("Update");
             et_title.setText(note.getTitle());
             et_content.setText(note.getContent());
-            setResult(note, 2);
+        }
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                note.setContent(et_content.getText().toString());
+                note.setTitle(et_title.getText().toString());
+                noteDatabase.getNoteDao().updateNote(note);
+            }
+        });
+ */
+        // If we are editing an existing note, we must receive note in the intent. Now we need
+        if ( (note = (Note) getIntent().getSerializableExtra("note"))!=null )
+        {
+            Log.d(TAG, "onCreate: getIntent = " + note.getTitle());
+
+            getSupportActionBar().setTitle("Update Note");
+            update = true;
+            button.setText("Update");
+            et_title.setText(note.getTitle());
+            et_content.setText(note.getContent());
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    note.setTitle(et_title.getText().toString());
+                    note.setContent(et_content.getText().toString());
+                    noteDatabase.getNoteDao().updateNote(note);
+                    setResult(note, 2);
+                }
+            });
+
         }
         // else if there is no intent data received, means we are adding a new Note
         else
         {
-            note = new Note(et_content.getText().toString(), et_title.getText().toString() );
-            new InsertTask(AddNoteActivity.this, note).execute();
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    note = new Note(et_content.getText().toString(), et_title.getText().toString() );
+                    new InsertTask(AddNoteActivity.this, note).execute();
+                }
+            });
+
         }
     }
 
     private void setResult(Note note, int flag){
+        Log.d(TAG, "setResult: note = " + note.getTitle() + ", flag = " + flag);
         setResult(flag, new Intent().putExtra("note", note));
-        //finish();
+        finish();
     }
 
     private static class InsertTask extends AsyncTask<Void, Void, Boolean>{

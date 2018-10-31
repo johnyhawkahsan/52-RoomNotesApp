@@ -25,6 +25,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNoteItemClick {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    public static final int NEW_NOTE_ACTIVITY_REQUEST_CODE = 100;
 
     private TextView textViewMsg;
     private RecyclerView recyclerView;
@@ -47,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
             public void onClick(View v) {
                 Log.i(TAG, "onClick: Launch new AddNoteActivity");
                 Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
-                startActivityForResult(intent, 100);
+                //startActivity(intent);
+                startActivityForResult(intent, NEW_NOTE_ACTIVITY_REQUEST_CODE);
             }
         });
 
@@ -100,11 +102,15 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
-        if (requestCode == 100 && resultCode > 0) {
+
+        if (requestCode == NEW_NOTE_ACTIVITY_REQUEST_CODE && resultCode > 0) {
             if (resultCode == 1) {
+                Log.d(TAG, "onActivityResult: resultCode ==1, new note added");
                 notes.add((Note) data.getSerializableExtra("note"));
             } else if (resultCode == 2) {
-                notes.set(pos, (Note) data.getSerializableExtra("note"));
+                Note receivedNote = (Note) data.getSerializableExtra("note");
+                Log.d(TAG, "onActivityResult: resultCode ==2 for updated note = " + receivedNote.getTitle());
+                notes.set(pos, receivedNote);
             }
             listVisibility();
         }
@@ -127,11 +133,8 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
                             case 1:
                                 MainActivity.this.pos = pos;
                                 Log.i(TAG, "onClick: update item at position = " + pos);
-                                startActivityForResult(
-                                        new Intent(MainActivity.this,
-                                                AddNoteActivity.class).putExtra("note", notes.get(pos)),
-                                        100);
-
+                                Intent intent = new Intent(MainActivity.this, AddNoteActivity.class).putExtra("note", notes.get(pos));
+                                startActivityForResult(intent, NEW_NOTE_ACTIVITY_REQUEST_CODE);
                                 break;
                         }
                     }
@@ -139,12 +142,15 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
 
     }
 
+    // If RecyclerView is empty (notes.size() == 0) , show textView. If it's not empty hide textViewMsg
     private void listVisibility() {
         int emptyMsgVisibility = View.GONE;
+
         if (notes.size() == 0) { // no item to display
-            if (textViewMsg.getVisibility() == View.GONE)
+            if (textViewMsg.getVisibility() == View.GONE) // just additional check to see if it's already GONE
                 emptyMsgVisibility = View.VISIBLE;
         }
+
         textViewMsg.setVisibility(emptyMsgVisibility);
         notesAdapter.notifyDataSetChanged();
     }
