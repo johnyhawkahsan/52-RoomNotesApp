@@ -9,7 +9,7 @@ import com.johnyhawkdesigns.a52_roomnotesapp.notedb.dao.NoteDao;
 import com.johnyhawkdesigns.a52_roomnotesapp.notedb.model.Note;
 import com.johnyhawkdesigns.a52_roomnotesapp.util.Constants;
 
-@Database(entities = {Note.class}, version = 1)
+@Database(entities = {Note.class}, version = 1, exportSchema = false)
 public abstract class NoteDatabase extends RoomDatabase{
 
     public abstract NoteDao getNoteDao();
