@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
     }
 
 
+    // This result is redirected from AddNoteActivity's method setResult. Below method checks for associated resultCode which we sent like this
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -105,14 +106,18 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
 
         if (requestCode == NEW_NOTE_ACTIVITY_REQUEST_CODE && resultCode > 0) {
             if (resultCode == 1) {
-                Log.d(TAG, "onActivityResult: resultCode ==1, new note added");
+                Log.d(TAG, "onActivityResult: resultCode = 1, new note added");
                 notes.add((Note) data.getSerializableExtra("note"));
             } else if (resultCode == 2) {
                 Note receivedNote = (Note) data.getSerializableExtra("note");
-                Log.d(TAG, "onActivityResult: resultCode ==2 for updated note = " + receivedNote.getTitle());
+                Log.d(TAG, "onActivityResult: resultCode = 2 for updated note = " + receivedNote.getTitle());
                 notes.set(pos, receivedNote);
             }
             listVisibility();
+        }
+
+        else if (resultCode == 0){
+            Log.d(TAG, "onActivityResult: resultCode = 0 for cancelled activity means back button is pressed ");
         }
     }
 
@@ -144,20 +149,21 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
 
     // If RecyclerView is empty (notes.size() == 0) , show textView. If it's not empty hide textViewMsg
     private void listVisibility() {
-        int emptyMsgVisibility = View.GONE;
+        int hideEmptyTextMessage = View.GONE;
 
         if (notes.size() == 0) { // no item to display
             if (textViewMsg.getVisibility() == View.GONE) // just additional check to see if it's already GONE
-                emptyMsgVisibility = View.VISIBLE;
+                hideEmptyTextMessage = View.VISIBLE;
         }
 
-        textViewMsg.setVisibility(emptyMsgVisibility);
+        textViewMsg.setVisibility(hideEmptyTextMessage);
         notesAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onDestroy() {
         noteDatabase.cleanUp();
+        noteDatabase.getNoteDao().deleteAll(); // delete all previously stored notes. This is just for testing.
         super.onDestroy();
     }
 }

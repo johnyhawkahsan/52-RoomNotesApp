@@ -17,7 +17,6 @@ public interface NoteDao {
     @Query("SELECT * FROM "+ Constants.TABLE_NAME_NOTE)
     List<Note> getNotes();
 
-
     /*
      * Insert the object in database
      * @param note, object to be inserted
@@ -46,5 +45,8 @@ public interface NoteDao {
      */
     @Delete
     void deleteNotes(Note... note);
+
+    @Query("DELETE FROM " + Constants.TABLE_NAME_NOTE)
+    void deleteAll();
 
 }

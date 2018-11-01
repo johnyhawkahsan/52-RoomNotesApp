@@ -33,34 +33,14 @@ public class AddNoteActivity extends AppCompatActivity {
         noteDatabase = NoteDatabase.getInstance(AddNoteActivity.this); // get single instance of NoteDatabase using singleton pattern
         Button button = findViewById(R.id.but_save);
 
-        // If we receive note data in intent, that means we are updating an existing note
-        Log.i(TAG, "onCreate: ");
-/*
-        if ( (note = (Note) getIntent().getSerializableExtra("note"))!=null ){
-            getSupportActionBar().setTitle("Update Note");
-            update = true;
-            button.setText("Update");
-            et_title.setText(note.getTitle());
-            et_content.setText(note.getContent());
-        }
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                note.setContent(et_content.getText().toString());
-                note.setTitle(et_title.getText().toString());
-                noteDatabase.getNoteDao().updateNote(note);
-            }
-        });
- */
         // If we are editing an existing note, we must receive note in the intent. Now we need
         if ( (note = (Note) getIntent().getSerializableExtra("note"))!=null )
         {
-            Log.d(TAG, "onCreate: getIntent = " + note.getTitle());
+            Log.d(TAG, "onCreate: received note in getIntent from MainActivity = " + note.getTitle());
 
             getSupportActionBar().setTitle("Update Note");
             update = true;
-            button.setText("Update");
+            button.setText("Update"); // Change text from "Save" to "Update"
             et_title.setText(note.getTitle());
             et_content.setText(note.getContent());
             button.setOnClickListener(new View.OnClickListener() {
@@ -80,16 +60,16 @@ public class AddNoteActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    note = new Note(et_content.getText().toString(), et_title.getText().toString() );
-                    new InsertTask(AddNoteActivity.this, note).execute();
+                    note = new Note(et_content.getText().toString(), et_title.getText().toString() ); // Add new note when "save" button is clicked
+                    Log.d(TAG, "onCreate: create a new note = " + note.getTitle());
+                    new InsertTask(AddNoteActivity.this, note).execute(); //launch InsertTask
                 }
             });
-
         }
     }
 
     private void setResult(Note note, int flag){
-        Log.d(TAG, "setResult: note = " + note.getTitle() + ", flag = " + flag);
+        Log.d(TAG, "setResult: setting result for note = " + note.getTitle() + ", flag = " + flag);
         setResult(flag, new Intent().putExtra("note", note));
         finish();
     }
@@ -119,7 +99,7 @@ public class AddNoteActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean bool) {
             if (bool){
-                activityReference.get().setResult(note,1);
+                activityReference.get().setResult(note,1); // 1 is resultCode for new note added
                 activityReference.get().finish();
             }
         }

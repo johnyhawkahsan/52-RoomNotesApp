@@ -26,6 +26,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     private LayoutInflater layoutInflater;
     private OnNoteItemClick onNoteItemClick; // Create an object of the interface
 
+    // Constructor
     public NotesAdapter(List<Note> list, Context context) {
         layoutInflater = LayoutInflater.from(context);
         this.list = list;
@@ -42,7 +43,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.e(TAG, "onBindViewHolder: "+ list.get(position));
+        Log.d(TAG, "onBindViewHolder: list.get(position) = "+ list.get(position));
         holder.textViewTitle.setText(list.get(position).getTitle());
         holder.textViewContent.setText(list.get(position).getContent());
     }
@@ -52,10 +53,13 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
         return list.size();
     }
 
+    // ViewHolder class which holds our note_list_item view and objects
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView textViewContent;
         TextView textViewTitle;
+
+        // Constructor
         public ViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
