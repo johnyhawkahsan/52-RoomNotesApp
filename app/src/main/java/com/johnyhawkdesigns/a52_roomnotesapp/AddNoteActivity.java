@@ -100,7 +100,7 @@ public class AddNoteActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean bool) {
             if (bool){
                 activityReference.get().setResult(note,1); // 1 is resultCode for new note added
-                activityReference.get().finish();
+                activityReference.get().finish(); // Finish this activity once result is set and new Note data sent to MainActivity
             }
         }
 

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
             public void onClick(View v) {
                 Log.i(TAG, "onClick: Launch new AddNoteActivity");
                 Intent intent = new Intent(MainActivity.this, AddNoteActivity.class);
-                //startActivity(intent);
+                // Start new activity for result means when this activity is finished, data will be returned in onActivityResult
                 startActivityForResult(intent, NEW_NOTE_ACTIVITY_REQUEST_CODE);
             }
         });
@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
         displayList();
     }
 
+
+    // Method to get instance of Database and retrieve data using AsyncTask (RetrieveTask)
     private void displayList() {
         noteDatabase = NoteDatabase.getInstance(MainActivity.this);
         new RetrieveTask(this).execute();
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
         protected List<Note> doInBackground(Void... voids) {
             Log.i(TAG, "doInBackground: retrieveTask. getNotes() from Dao");
             if (activityReference.get() != null)
-                return activityReference.get().noteDatabase.getNoteDao().getNotes();
+                return activityReference.get().noteDatabase.getNoteDao().getNotes(); // This line will return List<Note> to onPostExecute
             else
                 return null;
         }
@@ -88,8 +90,8 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
         @Override
         protected void onPostExecute(List<Note> notes) {
             if (notes != null && notes.size() > 0) {
-                activityReference.get().notes.clear();
-                activityReference.get().notes.addAll(notes);
+                activityReference.get().notes.clear(); // clear old notes
+                activityReference.get().notes.addAll(notes); // add retrieved notes to list
                 // hides empty text view
                 activityReference.get().textViewMsg.setVisibility(View.GONE);
                 activityReference.get().notesAdapter.notifyDataSetChanged();
@@ -104,16 +106,18 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
 
         Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
 
+        // We only have one request code which is NEW_NOTE_ACTIVITY_REQUEST_CODE = 100
         if (requestCode == NEW_NOTE_ACTIVITY_REQUEST_CODE && resultCode > 0) {
             if (resultCode == 1) {
-                Log.d(TAG, "onActivityResult: resultCode = 1, new note added");
-                notes.add((Note) data.getSerializableExtra("note"));
+                Note newNote = (Note) data.getSerializableExtra("note");
+                notes.add(newNote);
+                Log.d(TAG, "onActivityResult: resultCode = 1, new note added. Note title = " + newNote.getTitle());
             } else if (resultCode == 2) {
-                Note receivedNote = (Note) data.getSerializableExtra("note");
-                Log.d(TAG, "onActivityResult: resultCode = 2 for updated note = " + receivedNote.getTitle());
-                notes.set(pos, receivedNote);
+                Note updateNote = (Note) data.getSerializableExtra("note");
+                Log.d(TAG, "onActivityResult: resultCode = 2 for updated note = " + updateNote.getTitle());
+                notes.set(pos, updateNote);
             }
-            listVisibility();
+            listVisibility(); // Confirm our list visibility
         }
 
         else if (resultCode == 0){
@@ -131,14 +135,15 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
                         switch (i) {
                             case 0:
                                 noteDatabase.getNoteDao().deleteNote(notes.get(pos));
-                                Log.i(TAG, "onClick: delete item at position = " + pos);
+                                Log.i(TAG, "onClick: delete item at position = " + pos + ", Note Title = " + notes.get(pos).getTitle());
                                 notes.remove(pos);
-                                listVisibility();
+                                listVisibility(); // Recheck if the list is now empty so we can update textView with message
                                 break;
                             case 1:
                                 MainActivity.this.pos = pos;
-                                Log.i(TAG, "onClick: update item at position = " + pos);
-                                Intent intent = new Intent(MainActivity.this, AddNoteActivity.class).putExtra("note", notes.get(pos));
+                                Note updateNote = notes.get(pos);
+                                Intent intent = new Intent(MainActivity.this, AddNoteActivity.class).putExtra("note", updateNote);
+                                Log.i(TAG, "onClick: update item title = " + updateNote.getTitle());
                                 startActivityForResult(intent, NEW_NOTE_ACTIVITY_REQUEST_CODE);
                                 break;
                         }
